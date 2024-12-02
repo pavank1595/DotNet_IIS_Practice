@@ -1,0 +1,52 @@
+trigger: none
+
+pool:
+  name: "windowspool"
+  demands:
+    - Agent.Name -equals windowsagent
+
+variables:
+  IISWebsiteName: "dotnetsampleapp"
+
+resources:
+  pipelines:
+    - pipeline: "buildPipeline"
+      project: "DotNet_IIS_Project"
+      source: 'Build Pipeline'
+
+stages:
+- stage: DeployWebsie
+  displayName: "Deploy Website"
+
+  jobs:
+  - deployment: DeployWebsiteToDev
+    displayName: "Deploy Website to Dev"
+    environment: "windows servers.dev-vm"
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: none
+
+            - download: "buildPipeline"
+              name: "DownloadBuildArtifacts"
+              displayName: "Download Build Artifacts"
+              artifact: "SampleAppProject"
+            - task: IISWebAppManagementOnMachineGroup@0
+              name: "StopIIS"
+              displayName: "Stop IIS website"
+              inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StopWebsite'
+                StartStopWebsiteName: '${{ variables.IISWebsiteName }}'
+            - task: IISWebAppDeploymentOnMachineGroup@0
+              name: "DeployIISDev"
+              displayName: "Deploy IIS website to Dev"
+              inputs:
+                WebSiteName: '${{ variables.IISWebsiteName }}'
+                Package: '$(Pipeline.Workspace)\buildPipeline\SampleAppProject'
+            - task: IISWebAppManagementOnMachineGroup@0
+              inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StartWebsite'
+                StartStopWebsiteName: '${{ variables.IISWebsiteName }}'
