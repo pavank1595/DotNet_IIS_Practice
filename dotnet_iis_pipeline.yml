@@ -25,7 +25,7 @@ stages:
       inputs:
         SourceFolder: "C:/vsts-agent/_work/1/s"
         Contents: "**/*"
-        TargetFolder: "C:/vsts-agent/dotnet_code"
+        TargetFolder: "C:/dotnet_code"
 
   - job: BuildAndPublishCode
     displayName: "Build the code"
