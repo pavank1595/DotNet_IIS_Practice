@@ -1,9 +1,9 @@
 trigger: none
 
-pool:
-  name: "windowspool"
-  demands:
-    - Agent.Name -equals windowsagent
+# pool:
+#   name: "windowspool"
+#   demands:
+#     - Agent.Name -equals windowsagent
 
 variables:
   IISWebsiteName: "dotnetsampleapp"
