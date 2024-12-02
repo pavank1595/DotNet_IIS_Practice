@@ -1,0 +1,59 @@
+trigger:
+  branches:
+    include:
+      - development
+      - release
+
+pool:
+  name: "windowspool"
+  demands:
+    - Agent.Name -equals windowsagent
+
+variables:
+  buildConfiguration: "Release"
+  dotNetCodeLocation: "C:/dotnet_code"
+
+stages:
+- stage: Build
+  displayName: "Build the project"
+  jobs:
+  - job: CopyFiles
+    displayName: "Copy files form default location"
+    steps:
+    - task: CopyFiles@2
+      displayName: "Copying files form default location"
+      inputs:
+        SourceFolder: "C:/vsts-agent/_work/1/s"
+        Contents: "**/*"
+        TargetFolder: "C:/dotnet_code"
+
+  - job: BuildAndPublishCode
+    displayName: "Build the code"
+    dependsOn: CopyFiles
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: "Restore NuGet Packages"
+      inputs:
+        command: "restore"
+        workingDirectory: "C:/dotnet_code"
+        projects: "**/*.csproj"
+    - task: DotNetCoreCLI@2
+      displayName: "Building the project"
+      inputs:
+        command: "build"
+        workingDirectory: "C:/dotnet_code"
+        projects: "**/*.csproj"
+        arguments: "--configuration $(buildConfiguration)"
+    - task: DotNetCoreCLI@2
+      displayName: "Publishing the project"
+      inputs:
+        command: "publish"
+        workingDirectory: "C:/dotnet_code"
+        projects: "**/*.csproj"
+        arguments: "--configuration $(buildConfiguration) --output $(dotNetCodeLocation)/publish_package"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publishing build artifacts"
+      inputs:
+        PathtoPublish: "$(dotNetCodeLocation)/publish_package"
+        ArtifactName: "SampleAppProject"
+    
