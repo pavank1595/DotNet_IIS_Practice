@@ -6,7 +6,7 @@ pool:
     - Agent.Name -equals windowsagent
 
 variables:
-  IISWebsiteName: "dotnetapp"
+  IISWebsiteName: "dotnetsampleapp"
 
 resources:
   pipelines:
