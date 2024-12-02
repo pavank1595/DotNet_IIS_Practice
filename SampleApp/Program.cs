@@ -21,4 +21,4 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 // Ensure the application binds to all network interfaces (0.0.0.0) and listens on port 80
-app.Run("http://0.0.0.0:80");
+app.Run("http://0.0.0.0:8080");
